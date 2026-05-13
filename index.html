@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Vault</title>
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co.com/8nq81KWm/IMG-20260505-WA0004.jpg" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        overflow-x: hidden;
+        /* Gradient background based on requirement */
+        background: linear-gradient(135deg, #4c1d95, #6d28d9, #93c5fd);
+        background-size: 200% 200%;
+        animation: gradientMove 15s ease infinite;
+        color: white;
+        min-height: 100vh;
+      }
+
+      h1,
+      h2,
+      .romantic-font {
+        font-family: "Dancing Script", cursive;
+      }
+
+      @keyframes gradientMove {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Glassmorphism utility */
+      .glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      }
+
+      /* Floating Hearts Animation */
+      .heart {
+        position: fixed;
+        bottom: -10vh;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.8;
+        filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.6));
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(0) scale(0.5) rotate(0deg);
+          opacity: 0;
+        }
+        20% {
+          opacity: 0.8;
+        }
+        80% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(-110vh) scale(1.5) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      @keyframes sway {
+        0%,
+        100% {
+          margin-left: 0;
+        }
+        50% {
+          margin-left: 50px;
+        }
+      }
+
+      /* Hide scrollbar but keep functionality */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  </head>
+  <body class="relative">
+    <!-- Hearts Container -->
+    <div id="hearts-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- Main Content Container -->
+    <div class="relative z-10 container mx-auto px-4 py-10 max-w-4xl">
+      <!-- Header -->
+      <header class="text-center mb-12" data-aos="fade-down" data-aos-duration="1000">
+        <div class="inline-block relative">
+          <img src="foto/alin.jpg" alt="Memory Vault Logo" class="w-32 h-32 rounded-full object-cover border-4 border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.4)] mb-4 animate-pulse-slow" />
+        </div>
+        <h1 class="text-6xl md:text-7xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-200 to-blue-200 drop-shadow-lg">Memory Vault</h1>
+        <p id="quoteDisplay" class="text-lg md:text-xl font-light text-blue-100 italic transition-opacity duration-1000">"Memuat kenangan manis..."</p>
+      </header>
+
+      <!-- Upload Section -->
+      <section class="mb-16" data-aos="fade-up" data-aos-delay="200">
+        <div class="glass rounded-3xl p-6 md:p-8">
+          <h2 class="text-3xl mb-6 text-center text-pink-100"><i class="fa-solid fa-heart text-pink-300 mr-2"></i>Simpan Kenangan Baru</h2>
+
+          <form id="uploadForm" class="space-y-6">
+            <!-- File Input -->
+            <div class="relative flex flex-col items-center justify-center w-full">
+              <label
+                for="dropzone-file"
+                class="flex flex-col items-center justify-center w-full h-32 md:h-40 border-2 border-white/30 border-dashed rounded-2xl cursor-pointer bg-white/5 hover:bg-white/10 transition duration-300"
+              >
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                  <i class="fa-solid fa-cloud-arrow-up text-3xl md:text-4xl text-pink-200 mb-3"></i>
+                  <p class="mb-2 text-sm text-gray-200"><span class="font-semibold">Klik untuk memilih foto</span> kenangan kita</p>
+                </div>
+                <input id="dropzone-file" type="file" class="hidden" accept="image/*" />
+              </label>
+            </div>
+
+            <!-- Note Input -->
+            <div>
+              <label class="block text-sm font-medium text-pink-100 mb-2" for="note">Catatan Manis (Opsional)</label>
+              <textarea
+                id="note"
+                rows="3"
+                class="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 transition resize-none"
+                placeholder="Tuliskan sesuatu tentang foto ini..."
+              ></textarea>
+            </div>
+
+            <!-- Live Preview Card (Hidden initially) -->
+            <div id="previewContainer" class="hidden flex-col items-center mt-4">
+              <p class="text-sm text-pink-200 mb-2 italic">Preview Foto</p>
+              <div class="glass p-3 rounded-2xl max-w-sm w-full relative">
+                <img id="imagePreview" src="" alt="Preview" class="w-full h-auto rounded-xl shadow-lg" />
+                <div class="absolute bottom-5 left-5 right-5 bg-black/50 backdrop-blur-sm rounded-lg p-2 text-sm text-white">
+                  <p id="previewNote" class="italic truncate">-</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              id="submitBtn"
+              class="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-400 hover:to-violet-400 text-white font-semibold rounded-xl shadow-lg transform transition hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex justify-center items-center"
+            >
+              <i class="fa-solid fa-paper-plane mr-2"></i> Simpan ke Vault
+            </button>
+            <!-- Loading Indicator -->
+            <p id="loadingMsg" class="text-center text-sm text-pink-200 hidden"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Menyimpan kenangan dengan aman...</p>
+          </form>
+        </div>
+      </section>
+
+      <!-- Gallery Section -->
+      <section data-aos="fade-up" data-aos-delay="400">
+        <h2 class="text-4xl text-center mb-8 text-pink-100"><i class="fa-solid fa-images text-pink-300 mr-2"></i>Galeri Kenangan Kita</h2>
+
+        <div id="galleryContainer" class="space-y-12">
+          <!-- Data dari backend/mock akan dirender di sini -->
+          <div class="text-center text-gray-300 py-10" id="galleryLoading">
+            <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+            <p>Membuka lembaran kenangan...</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Floating Music Player -->
+    <div class="fixed bottom-4 right-4 z-50 glass p-3 rounded-2xl w-64 shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-300 hover:bg-white/20">
+      <!-- Playlist Menu (Hidden Initially) -->
+      <div id="playlistMenu" class="hidden flex-col bg-white/10 backdrop-blur-md border border-white/20 rounded-xl mb-3 overflow-hidden transition-all duration-300 shadow-lg">
+        <p class="text-xs font-semibold text-pink-200 p-2 border-b border-white/10 text-center bg-black/20"><i class="fa-solid fa-list-ul mr-1"></i> Pilih Lagu Spesial</p>
+        <div class="max-h-32 overflow-y-auto">
+          <button
+            class="track-item w-full text-left p-2 px-3 text-xs text-white hover:bg-pink-500/50 transition border-b border-white/5 flex items-center"
+            data-src="musik/lagu1.mp3"
+            data-title="Sesuatu Yang Sempurna"
+          >
+            <i class="fa-solid fa-music mr-2 text-pink-300"></i> Sesuatu Yang Sempurna
+          </button>
+          <button
+            class="track-item w-full text-left p-2 px-3 text-xs text-white hover:bg-pink-500/50 transition border-b border-white/5 flex items-center"
+            data-src="musik/lagu2.mp3"
+            data-title="Bukan Cinta Biasa"
+          >
+            <i class="fa-solid fa-music mr-2 text-pink-300"></i> Bukan Cinta Biasa
+          </button>
+          <button class="track-item w-full text-left p-2 px-3 text-xs text-white hover:bg-pink-500/50 transition flex items-center" data-src="musik/lagu3.mp3" data-title="Sedia Aku Sebelum Hujan">
+            <i class="fa-solid fa-music mr-2 text-pink-300"></i> Sedia Aku Sebelum Hujan
+          </button>
+          <button class="track-item w-full text-left p-2 px-3 text-xs text-white hover:bg-pink-500/50 transition flex items-center" data-src="musik/lagu4.mp3" data-title="Surat Cinta Untuk Starla">
+            <i class="fa-solid fa-music mr-2 text-pink-300"></i> Surat Cinta Untuk Starla
+          </button>
+          <button class="track-item w-full text-left p-2 px-3 text-xs text-white hover:bg-pink-500/50 transition flex items-center" data-src="musik/lagu5.mp3" data-title="Celengan Rindu">
+            <i class="fa-solid fa-music mr-2 text-pink-300"></i> Celengan Rindu
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center space-x-3 relative">
+        <button
+          id="playPauseBtn"
+          class="w-10 h-10 flex-shrink-0 bg-pink-500 hover:bg-pink-400 text-white rounded-full flex items-center justify-center transition shadow-lg z-10 hover:scale-110 active:scale-95"
+        >
+          <i class="fa-solid fa-play" id="playIcon"></i>
+        </button>
+        <div class="flex-1 min-w-0 cursor-pointer group" id="playlistToggle">
+          <p class="text-xs font-semibold text-white truncate mb-1 flex justify-between items-center">
+            <span>Our Playlist</span>
+            <i class="fa-solid fa-chevron-up text-pink-300 transition-transform duration-300 group-hover:-translate-y-1" id="chevronIcon"></i>
+          </p>
+          <p id="currentSongLabel" class="text-[10px] text-pink-200 truncate border-b border-white/30 pb-1 italic">Romantic Melody 1</p>
+        </div>
+      </div>
+
+      <audio id="audioPlayer" loop>
+        <source id="audioSource" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+      </audio>
+    </div>
+
+    <script>
+      // ==========================================
+      // KONFIGURASI BACKEND
+      // ==========================================
+      // Ganti string kosong di bawah dengan URL Web App Apps Script Anda!
+      // Contoh: "https://script.google.com/macros/s/AKfycby.../exec"
+      const API_URL = "https://script.google.com/macros/s/AKfycbxdfjp5zJYbXgQ9lO41I4ax4I8sGHLgLcXPLv3jsQkr3S6Bbvr8mDR-X3tHedNwD-Gq/exec";
+      // ==========================================
+
+      // --- 1. Init Animations & Floating Hearts ---
+      AOS.init({ once: true });
+
+      // Kata-kata Romantis Dinamis
+      const romanticQuotes = [
+        "Di antara miliaran bintang, kamulah satu-satunya yang paling terang di hatiku.",
+        "Waktu mungkin berlalu, tapi kenangan kita di sini akan abadi selamanya.",
+        "Setiap detik bersamamu adalah puisi yang tak pernah bosan kubaca.",
+        "Bukan tentang seberapa lama kita bersama, tapi seberapa dalam cinta yang kita rasa.",
+        "Kamu adalah alasan mengapa aku selalu tersenyum tanpa alasan.",
+        "Tempat di mana waktu berhenti, dan rasa sayangku kepadamu tak pernah mati.",
+        "Dalam diam, doaku selalu menyertakan namamu dan kebahagiaan kita.",
+        "Dunia ini luas, tapi di pelukanmu aku menemukan rumahku.",
+      ];
+
+      function setRandomQuote() {
+        const quoteEl = document.getElementById("quoteDisplay");
+        const randomIndex = Math.floor(Math.random() * romanticQuotes.length);
+
+        quoteEl.style.opacity = 0; // Fade out effect
+        setTimeout(() => {
+          quoteEl.innerText = `"${romanticQuotes[randomIndex]}"`;
+          quoteEl.style.opacity = 1; // Fade in effect
+        }, 600);
+      }
+
+      // Jalankan kutipan saat pertama kali dimuat
+      setRandomQuote();
+
+      // Variasi warna untuk animasi love
+      const heartColors = ["text-pink-300", "text-red-300", "text-red-400", "text-fuchsia-300", "text-rose-300"];
+
+      function createHeart() {
+        const container = document.getElementById("hearts-container");
+        const heart = document.createElement("i");
+        const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
+
+        heart.classList.add("fa-solid", "fa-heart", "heart", randomColor);
+
+        // Randomize position, size, and duration
+        heart.style.left = Math.random() * 100 + "vw";
+        const floatDuration = Math.random() * 8 + 6; // 6-14 detik ke atas
+        const swayDuration = Math.random() * 3 + 2; // 2-5 detik goyangan horizontal
+
+        // Menggabungkan animasi floatUp dan sway
+        heart.style.animation = `floatUp ${floatDuration}s ease-in infinite, sway ${swayDuration}s ease-in-out infinite alternate`;
+        heart.style.fontSize = Math.random() * 20 + 10 + "px"; // Ukuran antara 10px - 30px
+
+        container.appendChild(heart);
+
+        // Remove after animation completes
+        setTimeout(() => {
+          heart.remove();
+        }, floatDuration * 1000);
+      }
+
+      // Menambahkan partikel hati setiap 600ms
+      setInterval(createHeart, 600);
+
+      // --- 2. Music Player Logic ---
+      const audio = document.getElementById("audioPlayer");
+      const playBtn = document.getElementById("playPauseBtn");
+      const playIcon = document.getElementById("playIcon");
+      const playlistToggle = document.getElementById("playlistToggle");
+      const playlistMenu = document.getElementById("playlistMenu");
+      const chevronIcon = document.getElementById("chevronIcon");
+      const currentSongLabel = document.getElementById("currentSongLabel");
+      const trackItems = document.querySelectorAll(".track-item");
+
+      playBtn.addEventListener("click", () => {
+        if (audio.paused) {
+          audio.play();
+          playIcon.classList.replace("fa-play", "fa-pause");
+        } else {
+          audio.pause();
+          playIcon.classList.replace("fa-pause", "fa-play");
+        }
+      });
+
+      // Toggle menu buka/tutup
+      playlistToggle.addEventListener("click", () => {
+        playlistMenu.classList.toggle("hidden");
+        playlistMenu.classList.toggle("flex");
+        chevronIcon.classList.toggle("rotate-180");
+      });
+
+      // Saat lagu dipilih dari daftar
+      trackItems.forEach((item) => {
+        item.addEventListener("click", (e) => {
+          const src = item.getAttribute("data-src");
+          const title = item.getAttribute("data-title");
+
+          audio.src = src;
+          currentSongLabel.textContent = title;
+          audio.play();
+          playIcon.classList.replace("fa-play", "fa-pause");
+
+          // Tutup menu otomatis setelah memilih lagu
+          playlistMenu.classList.add("hidden");
+          playlistMenu.classList.remove("flex");
+          chevronIcon.classList.remove("rotate-180");
+        });
+      });
+
+      // --- 3. Upload & Live Preview Logic ---
+      const fileInput = document.getElementById("dropzone-file");
+      const noteInput = document.getElementById("note");
+      const previewContainer = document.getElementById("previewContainer");
+      const imagePreview = document.getElementById("imagePreview");
+      const previewNote = document.getElementById("previewNote");
+      const uploadForm = document.getElementById("uploadForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const loadingMsg = document.getElementById("loadingMsg");
+
+      let currentBase64 = null;
+
+      fileInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            currentBase64 = event.target.result;
+            imagePreview.src = currentBase64;
+            previewContainer.classList.remove("hidden");
+            previewContainer.classList.add("flex");
+            previewContainer.classList.add("animate-bounce-short");
+            setTimeout(() => previewContainer.classList.remove("animate-bounce-short"), 1000);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      noteInput.addEventListener("input", function (e) {
+        previewNote.textContent = e.target.value || "Tanpa catatan...";
+      });
+
+      // --- 4. Backend Communication API Fetch ---
+
+      // Data dummy untuk keperluan preview lokal (ketika API_URL belum diisi)
+      let mockGalleryData = [
+        {
+          folder: "Mei 2026",
+          images: [
+            {
+              url: "https://images.unsplash.com/photo-1518199268815-95a17b2e5604?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+              note: "Kencan pertama kita bulan ini ❤️",
+              time: "19:30",
+            },
+          ],
+        },
+      ];
+
+      uploadForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!currentBase64) {
+          alert("Pilih foto kenangan kita dulu ya!");
+          return;
+        }
+
+        const fileName = fileInput.files[0].name;
+        const noteText = noteInput.value;
+
+        // UI Loading state
+        submitBtn.disabled = true;
+        submitBtn.classList.add("hidden");
+        loadingMsg.classList.remove("hidden");
+
+        if (API_URL !== "") {
+          // Fetch API untuk standalone HTML yang mengirim POST Request ke GAS
+          fetch(API_URL, {
+            method: "POST",
+            // Kita gunakan text/plain untuk menghindari CORS preflight OPTIONS block dari Google Apps Script
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "upload",
+              base64: currentBase64,
+              fileName: fileName,
+              note: noteText,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              finishUpload(data.success, data.message || "Gagal menyimpan di server.");
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              finishUpload(false, "Terjadi kesalahan jaringan.");
+            });
+        } else {
+          // Simulasi lokal jika API belum disetel
+          setTimeout(() => {
+            mockGalleryData[0].images.unshift({
+              url: currentBase64,
+              note: noteText || "Tanpa catatan",
+              time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+            });
+            finishUpload(true);
+          }, 2000);
+        }
+      });
+
+      function finishUpload(success, errorMsg = "") {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("hidden");
+        loadingMsg.classList.add("hidden");
+
+        if (success) {
+          uploadForm.reset();
+          previewContainer.classList.add("hidden");
+          previewContainer.classList.remove("flex");
+          currentBase64 = null;
+          showToast("Kenangan berhasil disimpan! 💖");
+          loadGallery(); // Reload gallery
+        } else {
+          alert("Gagal menyimpan: " + errorMsg);
+        }
+      }
+
+      // --- 5. Render Gallery ---
+      function loadGallery() {
+        const container = document.getElementById("galleryContainer");
+
+        if (API_URL !== "") {
+          // Fetch API untuk mengambil list file (GET Request)
+          fetch(API_URL)
+            .then((response) => response.json())
+            .then((data) => {
+              renderGalleryData(data);
+            })
+            .catch((error) => {
+              console.error("Fetch error:", error);
+              container.innerHTML = `
+                        <div class="text-center text-red-300 p-8 glass rounded-2xl">
+                            <i class="fa-solid fa-triangle-exclamation text-4xl mb-3"></i>
+                            <p>Gagal memuat galeri kenangan. Pastikan URL API sudah benar.</p>
+                        </div>`;
+            });
+        } else {
+          renderGalleryData(mockGalleryData);
+        }
+      }
+
+      function renderGalleryData(data) {
+        const container = document.getElementById("galleryContainer");
+        container.innerHTML = ""; // Clear loading
+
+        if (!data || data.length === 0) {
+          container.innerHTML = `
+                    <div class="text-center text-gray-300 p-8 glass rounded-2xl">
+                        <i class="fa-regular fa-folder-open text-4xl mb-3 text-pink-300"></i>
+                        <p>Belum ada kenangan yang tersimpan. Yuk upload foto pertama kita!</p>
+                    </div>`;
+          return;
+        }
+
+        data.forEach((monthData, index) => {
+          const monthDiv = document.createElement("div");
+          monthDiv.setAttribute("data-aos", "fade-up");
+          monthDiv.setAttribute("data-aos-delay", index * 100);
+
+          let imagesHTML = monthData.images
+            .map(
+              (img) => `
+                    <div class="glass rounded-xl overflow-hidden group hover:shadow-[0_8px_30px_rgba(236,72,153,0.3)] transition duration-500 flex flex-col">
+                        <div class="relative overflow-hidden h-48 sm:h-64">
+                            <img src="${img.url}" alt="Memory" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                                <a href="${img.url}" target="_blank" download class="bg-white/20 backdrop-blur-md hover:bg-pink-500 text-white rounded-full p-2 px-4 transition text-sm flex items-center">
+                                    <i class="fa-solid fa-download mr-2"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <p class="text-sm font-light text-gray-200 flex-grow italic">"${img.note}"</p>
+                            <div class="mt-3 flex justify-between items-center text-xs text-pink-200">
+                                <span><i class="fa-regular fa-clock mr-1"></i> ${img.time} WIB</span>
+                                <i class="fa-solid fa-heart text-pink-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                `,
+            )
+            .join("");
+
+          monthDiv.innerHTML = `
+                    <div class="mb-4 flex items-center">
+                        <div class="flex-grow h-px bg-gradient-to-r from-transparent via-pink-300/50 to-transparent"></div>
+                        <h3 class="mx-4 text-2xl romantic-font text-pink-100 tracking-wider">${monthData.folder}</h3>
+                        <div class="flex-grow h-px bg-gradient-to-r from-transparent via-pink-300/50 to-transparent"></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        ${imagesHTML}
+                    </div>
+                `;
+          container.appendChild(monthDiv);
+        });
+        AOS.refresh();
+      }
+
+      // Custom Toast Notification
+      function showToast(message) {
+        const toast = document.createElement("div");
+        toast.className =
+          "fixed top-5 left-1/2 transform -translate-x-1/2 glass px-6 py-3 rounded-full text-white font-medium shadow-2xl z-[100] transition-all duration-500 translate-y-[-100px] opacity-0";
+        toast.innerHTML = `<i class="fa-solid fa-check-circle text-green-300 mr-2"></i>${message}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.remove("translate-y-[-100px]", "opacity-0");
+        }, 100);
+        setTimeout(() => {
+          toast.classList.add("translate-y-[-100px]", "opacity-0");
+          setTimeout(() => toast.remove(), 500);
+        }, 3000);
+      }
+
+      // Initialize Gallery on load
+      window.addEventListener("DOMContentLoaded", loadGallery);
+    </script>
+  </body>
+</html>
